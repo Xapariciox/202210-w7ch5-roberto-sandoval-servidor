@@ -50,7 +50,6 @@ export class RobotRepository implements Data<Robot> {
     async delete(id: id): Promise<void> {
         const result = await this.#Model.findByIdAndDelete(id);
         if (result === null) throw new Error('Not found id');
-        return;
     }
 
     #disconnect() {
