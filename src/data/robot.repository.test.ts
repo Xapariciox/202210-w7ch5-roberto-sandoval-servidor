@@ -49,7 +49,7 @@ describe('Given RobotRepository', () => {
     test('when patch it receives an invalid id it should return an error', async () => {
         expect(async () => {
             await repository.patch(testIds[3], { name: 'pepe' });
-        }).rejects.toThrowError();
+        }).rejects.toThrow();
     });
 
     test('Then delete should return an id of the removed robot', async () => {
