@@ -47,12 +47,13 @@ export class RobotRepository implements Data<Robot> {
         return result as Robot;
     }
 
-    async delete(id: id): Promise<void> {
+    async delete(id: id): Promise<{ id: id }> {
         const result = await this.#Model.findByIdAndDelete(id);
         if (result === null) throw new Error('Not found id');
+        return { id: id };
     }
 
-    #disconnect() {
+    disconnect() {
         mongoose.disconnect();
         console.log(mongoose.connection.readyState);
     }
