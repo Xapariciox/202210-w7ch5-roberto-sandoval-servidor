@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import { CustomError } from './interfaces/error.js';
 import { RobotRouter } from './router/robots.js';
+import { usersRouter } from './router/user.js';
 
 export const app = express();
 app.disable('x-powered-by');
@@ -21,12 +22,18 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Bienvenido a mi Home').end();
+    res.send('Bienvenido a mi funny challenge :c').end();
 });
 app.use('/robots', RobotRouter);
+app.use('/users', usersRouter);
 
 app.use(
-    (error: CustomError, _req: Request, resp: Response, next: NextFunction) => {
+    (
+        error: CustomError,
+        _req: Request,
+        resp: Response,
+        _next: NextFunction
+    ) => {
         console.log(error.statusCode, error.statusMessage, error.message);
         let status = error.statusCode || 500;
         if (error.name === 'ValidationError') {
