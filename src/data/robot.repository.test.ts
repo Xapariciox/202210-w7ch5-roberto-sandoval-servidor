@@ -56,6 +56,11 @@ describe('Given RobotRepository', () => {
         const result = await repository.delete(testIds[0]);
         expect(result).toEqual({ id: testIds[0] });
     });
+    test('when delete it receives an invalid id it should return an error', async () => {
+        expect(async () => {
+            await repository.delete('637b3cae61784518a8fb8dd8');
+        }).rejects.toThrowError(Error);
+    });
     afterAll(async () => {
         await repository.disconnect();
     });
