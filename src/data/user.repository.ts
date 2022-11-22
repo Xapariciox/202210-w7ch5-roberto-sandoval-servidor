@@ -4,7 +4,7 @@ import { passwdEncrypt } from '../services/auth.js';
 import { BasicRepo, id } from './data.js';
 
 export class UserRepository implements BasicRepo<User> {
-    #Model = model('Coffee', userSchema, 'coffees');
+    #Model = model('User', userSchema, 'users');
 
     async get(id: id): Promise<User> {
         const result = await this.#Model.findById(id);
