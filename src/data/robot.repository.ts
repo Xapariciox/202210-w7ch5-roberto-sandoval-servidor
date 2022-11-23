@@ -1,61 +1,83 @@
-import { Robot, ProtoRobot } from '../entities/robot';
-import { Data, id } from './data.js';
-import mongoose, { Schema, model } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { RobotI, ProtoRobotI } from '../entities/robot.js';
+import { Robot } from '../entities/robot.js';
+import { Repo, id } from './data.js';
 
-export class RobotRepository implements Data<Robot> {
-    #schema = new Schema({
-        name: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        image: String,
-        speed: String,
-        endurance: String,
-        date: String,
-    });
-    #Model = model('Robot', this.#schema, 'robots');
+export class RobotRepository implements Repo<RobotI> {
+    static instance: RobotRepository;
 
-    constructor() {
-        this.#schema.set('toJSON', {
-            transform: (_document, returnedObject) => {
-                returnedObject.id = returnedObject._id;
-                delete returnedObject.__v;
-                delete returnedObject._id; //Pendiente ver si puedo quitar el Date
-            },
+    public static getInstance(): RobotRepository {
+        if (!RobotRepository.instance) {
+            RobotRepository.instance = new RobotRepository();
+        }
+        return RobotRepository.instance;
+    }
+
+    #Model = Robot;
+
+    async getAll(): Promise<Array<RobotI>> {
+        return this.#Model.find().populate('owner', {
+            robots: 0,
         });
     }
-
-    async getAll(): Promise<Array<Robot>> {
-        return this.#Model.find();
-    }
-    async get(id: id): Promise<Robot> {
-        const result = await this.#Model.findById(id);
+    async get(id: id): Promise<RobotI> {
+        const result = await this.#Model
+            .findById(id)
+            .populate<{ _id: Types.ObjectId }>('owner');
         if (!result) throw new Error('Not found id');
-        return result as Robot;
+        return result;
     }
 
-    async post(data: ProtoRobot): Promise<Robot> {
-        const result = await this.#Model.create(data);
-        return result as Robot;
-    }
-    async patch(id: id, data: Partial<Robot>): Promise<Robot> {
-        const result = await this.#Model.findByIdAndUpdate(id, data, {
-            new: true,
+    async find(search: {
+        [key: string]: string | number | Date;
+    }): Promise<RobotI> {
+        const result = await this.#Model.findOne(search).populate('owner', {
+            robots: 0,
         });
         if (!result) throw new Error('Not found id');
-        return result as Robot;
+        return result as unknown as RobotI;
     }
 
-    async delete(id: id): Promise<{ id: id }> {
-        const result = await this.#Model.findByIdAndDelete(id);
+    async post(data: ProtoRobotI): Promise<RobotI> {
+        data.date = this.#generateDate(data.date as string);
+        const result = await (
+            await this.#Model.create(data)
+        ).populate('owner', {
+            robots: 0,
+        });
+        return result;
+    }
+    async patch(id: id, data: Partial<RobotI>): Promise<RobotI> {
+        const result = await this.#Model
+            .findByIdAndUpdate(id, data, {
+                new: true,
+            })
+            .populate('owner', {
+                robots: 0,
+            });
+        if (!result) throw new Error('Not found id');
+        return result;
+    }
+
+    async delete(id: id): Promise<id> {
+        const result = await this.#Model
+            .findByIdAndDelete(id)
+            .populate('owner', {
+                robots: 0,
+            });
         if (result === null) throw new Error('Not found id');
-        return { id: id };
+        return id;
     }
 
-    disconnect() {
+    #disconnect() {
         mongoose.disconnect();
-        console.log(mongoose.connection.readyState);
+    }
+
+    #generateDate(date: string | undefined) {
+        if (!date) return new Date();
+        const validDate =
+            new Date(date) === new Date('') ? new Date() : new Date(date);
+        return validDate;
     }
 
     getModel() {

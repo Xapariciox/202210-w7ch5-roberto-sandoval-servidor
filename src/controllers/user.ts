@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import { BasicRepo, User } from '../entities/user.js';
+import { RobotI } from '../entities/robot.js';
+import { BasicRepo, Repo, UserI } from '../entities/user.js';
 import { HTTPError } from '../interfaces/error.js';
 
 import { createToken, passwdValidate } from '../services/auth.js';
 
 export class UserController {
-    constructor(public readonly repository: BasicRepo<User>) {
+    constructor(
+        public readonly repository: BasicRepo<UserI>,
+        public readonly robotRepo: Repo<RobotI>
+    ) {
         //
     }
 

@@ -21,4 +21,3 @@ export const passwdEncrypt = (passwd: string) => {
 export const passwdValidate = (newPasswd: string, hash: string) => {
     return bc.compare(newPasswd, hash);
 };
-export const clave = createToken({ userName: 'pepe' });
