@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 export type id = number | string;
-export type User = {
+export type UserI = {
     id: string;
     name: string;
     email: string;
@@ -49,3 +49,4 @@ userSchema.set('toJSON', {
         delete returnedObject.passwd;
     },
 });
+export const User = model<UserI>('User', userSchema, 'users');

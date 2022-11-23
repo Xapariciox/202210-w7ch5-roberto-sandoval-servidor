@@ -1,6 +1,7 @@
-import { dbConnect } from '../db.connect';
-import { mockData } from '../mock/mock';
-import { RobotRepository } from './robot.repository';
+import mongoose from 'mongoose';
+import { dbConnect } from '../db.connect.js';
+import { mockData } from '../mock/mock.js';
+import { RobotRepository } from './robot.repository.js';
 
 describe('Given RobotRepository', () => {
     const repository = new RobotRepository();
@@ -62,6 +63,6 @@ describe('Given RobotRepository', () => {
         }).rejects.toThrowError(Error);
     });
     afterAll(async () => {
-        await repository.disconnect();
+        await mongoose.disconnect();
     });
 });
